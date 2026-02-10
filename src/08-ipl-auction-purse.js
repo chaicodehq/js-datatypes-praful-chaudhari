@@ -44,5 +44,53 @@
  *   // => { ..., remaining: -1200, isOverBudget: true }
  */
 export function iplAuctionSummary(team, players) {
-  // Your code here
+    // Your code here
+
+    if (
+        typeof team !== "object" ||
+        team === null ||
+        Object.keys(team).length === 0 ||
+        Array.isArray(team)
+    )
+        return null;
+    if (typeof team.purse !== "number" || team.purse < 0) return null;
+    if (!Array.isArray(players) || players.length === 0) return null;
+
+    const names = players.map((player) => player.name);
+    const roles = players.map((player) => player.role);
+    const prices = players.map((player) => player.price);
+
+    const totalSpent = prices.reduce((acc, price) => acc + price, 0);
+    const isOverBudget = totalSpent > team.purse;
+
+    const costliestPlayer =
+        players[names.indexOf(names[prices.indexOf(Math.max(...prices))])];
+    const cheapestPlayer =
+        players[names.indexOf(names[prices.indexOf(Math.min(...prices))])];
+
+    const playerCount = names.length;
+    const averagePrice = Math.round(totalSpent / playerCount);
+
+    const batters = roles.filter((role) => role === "bat");
+    const bowlers = roles.filter((role) => role === "bowl");
+    const allRounders = roles.filter((role) => role === "ar");
+    const weeketKeepers = roles.filter((role) => role === "wk");
+
+    const byRole = {};
+    if (batters.length > 0) byRole.bat = batters.length;
+    if (bowlers.length > 0) byRole.bowl = bowlers.length;
+    if (allRounders.length > 0) byRole.ar = allRounders.length;
+    if (weeketKeepers.length > 0) byRole.wk = weeketKeepers.length;
+
+    return {
+        teamName: team.name,
+        totalSpent,
+        remaining: team.purse - totalSpent,
+        playerCount,
+        costliestPlayer,
+        cheapestPlayer,
+        averagePrice,
+        byRole,
+        isOverBudget,
+    };
 }

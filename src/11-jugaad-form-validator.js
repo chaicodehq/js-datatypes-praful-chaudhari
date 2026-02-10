@@ -59,8 +59,97 @@
  *     name: "", email: "bad-email", phone: "12345", age: 10,
  *     pincode: "0123", state: null, agreeTerms: false
  *   })
- *   // => { isValid: false, errors: { name: "...", email: "...", ... } }
+ *   // => { isValid: false, errors: { name: "...", email: "...", ... } } /^[a-z\s]+$/i.test(name)
  */
 export function validateForm(formData) {
-  // Your code here
+    // Your code here
+
+    // name validation
+    const name = formData.name.trim();
+    let isNameValid = false;
+    if (name.length >= 2 && name.length <= 50) isNameValid = true;
+
+    // email validation
+    const email = formData.email.trim();
+    let isEmailValid = false;
+    const emailCheck1 = email.includes("@") && email.split("@").length === 2;
+    const emailCheck2 =
+        emailCheck1 &&
+        email.split("@")[1].includes(".") &&
+        email.split("@")[1].split(".").length >= 1;
+    if (emailCheck1 && emailCheck2) isEmailValid = true;
+
+    // phone validation
+    const phone = formData.phone;
+    let isPhoneValid = false;
+    const phoneCheck1 =
+        typeof phone === "string" && phone.length === 10 && /^\d+$/.test(phone);
+    const phoneCheck2 =
+        phoneCheck1 && ["6", "7", "8", "9"].includes(phone.charAt());
+    if (phoneCheck1 && phoneCheck2) isPhoneValid = true;
+
+    // age validation
+    let age = formData.age;
+    let isAgeValid = false;
+    if (typeof age === "string") age = parseInt(age);
+    const ageCheck1 = Number.isInteger(age);
+    const ageCheck2 = age >= 16 && age <= 100;
+    if (ageCheck1 && ageCheck2) isAgeValid = true;
+
+    // pincode validation
+    const pincode = formData.pincode;
+    let isPincodeValid = false;
+    const pincodeCheck1 =
+        typeof pincode === "string" &&
+        pincode.length === 6 &&
+        pincode.charAt() !== "0" &&
+        /^\d+$/.test(pincode);
+    if (pincodeCheck1) isPincodeValid = true;
+
+    // state validation
+    const state = formData.state;
+    let isStateValid = false;
+    const stateCheck1 = state && state.length > 0;
+    if (stateCheck1) isStateValid = true;
+
+    // agree terms validation
+    const terms = formData.agreeTerms;
+    let isTermsValid = false;
+    if (terms) isTermsValid = true;
+
+    // errors object
+    const errors = {};
+    if (!isNameValid) {
+        errors.name = "Name must be 2-50 characters";
+    }
+    if (!isEmailValid) {
+        errors.email = "Invalid email format";
+    }
+    if (!isPhoneValid) {
+        errors.phone = "Invalid Indian phone number";
+    }
+    if (!isAgeValid) {
+        errors.age = "Age must be an integer between 16 and 100";
+    }
+    if (!isPincodeValid) {
+        errors.pincode = "Invalid Indian pincode";
+    }
+    if (!isStateValid) {
+        errors.state = "State is required";
+    }
+    if (!isTermsValid) {
+        errors.agreeTerms = "Must agree to terms";
+    }
+
+    return {
+        isValid:
+            isNameValid &&
+            isEmailValid &&
+            isPhoneValid &&
+            isAgeValid &&
+            isPincodeValid &&
+            isStateValid &&
+            isTermsValid,
+        errors,
+    };
 }
